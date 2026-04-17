@@ -1,51 +1,32 @@
-import { useState } from 'react'
-import { Box, Button, Container, Paper, TextField, Typography } from '@mui/material'
+import {Button, TextField} from "@mui/material";
+import React, {useState} from "react";
+import { useNavigate } from "react-router-dom";
 
-function Login({ onLogin }) {
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
+const Login = () => {
+    const navigate = useNavigate();
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const onsubmit = async (e) => {        
+      e.preventDefault();
+      if (!username || !password) {
+        alert("Username and password are required");
+        return;
+      }
+      const res = login({username:username, password:password});
+      if (res.isLogin === true) {
+        setUsername("");
+        setPassword("");
+        navigate("/perfil");
+      }
+    };
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    onLogin(username, password)
-  }
-
-  return (
-    <Container maxWidth="sm" sx={{ mt: 8 }}>
-      <Paper elevation={3} sx={{ p: 4 }}>
-        <Typography variant="h4" align="center" gutterBottom>
-          Iniciar sesión
-        </Typography>
-
-        <Box
-          component="form"
-          onSubmit={handleSubmit}
-          sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
-        >
-          <TextField
-            label="Nombre de usuario"
-            variant="outlined"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            fullWidth
-          />
-
-          <TextField
-            label="Contraseña"
-            type="password"
-            variant="outlined"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            fullWidth
-          />
-
-          <Button type="submit" variant="contained" size="large">
-            Iniciar sesión
-          </Button>
-        </Box>
-      </Paper>
-    </Container>
-  )
+    return (
+      <>
+      <form onSubmit={onsubmit}>
+        <TextField value={username} onChange={(e) => setUsername(e.target.value)} />
+        <TextField value={password} onChange={(e) => setPassword(e.target.value)} />
+        <button type="submit">Login</button>
+      </form>
+      </>
+    );
 }
-
-export default Login
