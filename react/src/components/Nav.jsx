@@ -14,9 +14,13 @@ function Navbar({ onLogout }) {
           <Button color="inherit" component={Link} to="/perfil">
             Perfil
           </Button>
+          <Button color="inherit" component={Link} to="/usuarios">
+            Usuarios
+          </Button>
           <Button color="inherit" onClick={onLogout}>
             Cerrar sesión
           </Button>
+
         </div>
       </Toolbar>
     </AppBar>

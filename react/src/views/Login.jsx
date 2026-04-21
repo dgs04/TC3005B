@@ -1,32 +1,74 @@
-import {Button, TextField} from "@mui/material";
-import React, {useState} from "react";
+import { TextField, Button, Box, Paper, Typography } from "@mui/material";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const Login = () => {
-    const navigate = useNavigate();
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-    const onsubmit = async (e) => {        
-      e.preventDefault();
-      if (!username || !password) {
-        alert("Username and password are required");
-        return;
-      }
-      const res = login({username:username, password:password});
-      if (res.isLogin === true) {
-        setUsername("");
-        setPassword("");
-        navigate("/perfil");
-      }
-    };
+function Login({ onLogin }) {
+  const navigate = useNavigate();
 
-    return (
-      <>
-      <form onSubmit={onsubmit}>
-        <TextField value={username} onChange={(e) => setUsername(e.target.value)} />
-        <TextField value={password} onChange={(e) => setPassword(e.target.value)} />
-        <button type="submit">Login</button>
-      </form>
-      </>
-    );
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  const onsubmit = async (e) => {
+    e.preventDefault();
+
+    const res = await onLogin({
+      username,
+      password
+    });
+
+    if (res.success) {
+      setUsername("");
+      setPassword("");
+      navigate("/home");
+    } else {
+      alert("Credenciales incorrectas");
+    }
+  };
+
+  return (
+    <Box
+      sx={{
+        minHeight: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center"
+      }}
+    >
+      <Paper sx={{ p: 4, width: 350 }}>
+        <Typography variant="h5" mb={2}>
+          Login
+        </Typography>
+
+        <form onSubmit={onsubmit}>
+          <TextField
+            label="Username"
+            fullWidth
+            margin="normal"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+
+          <TextField
+            label="Password"
+            type="password"
+            fullWidth
+            margin="normal"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+
+          <Button
+            type="submit"
+            variant="contained"
+            fullWidth
+            sx={{ mt: 2 }}
+          >
+            Entrar
+          </Button>
+        </form>
+      </Paper>
+    </Box>
+  );
 }
+
+export default Login;
