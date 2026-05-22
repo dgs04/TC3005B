@@ -14,7 +14,6 @@ import {
 const API_URL = "http://localhost:5001";
 
 function Usuarios() {
-
   const [users, setUsers] = useState([]);
 
   const [form, setForm] = useState({
@@ -23,45 +22,52 @@ function Usuarios() {
     password: ""
   });
 
-  const getUsers = async () => {
+  const getToken = () => {
+    return localStorage.getItem("token");
+  };
 
-    const res = await fetch(API_URL + "/users");
+  const getUsers = async () => {
+    const token = getToken();
+
+    const res = await fetch(API_URL + "/users", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
 
     const data = await res.json();
 
-    setUsers(data);
-
+    if (Array.isArray(data)) {
+      setUsers(data);
+    } else {
+      alert(data.msg || "No se pudieron cargar los usuarios");
+    }
   };
 
   useEffect(() => {
-
     getUsers();
-
   }, []);
 
   const handleChange = (e) => {
-
     setForm({
       ...form,
       [e.target.name]: e.target.value
     });
-
   };
 
   const addUser = async (e) => {
-
     e.preventDefault();
 
+    const token = getToken();
+
     await fetch(API_URL + "/users", {
-
       method: "POST",
-
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
       },
-
       body: JSON.stringify(form)
-
     });
 
     setForm({
@@ -71,33 +77,29 @@ function Usuarios() {
     });
 
     getUsers();
-
   };
 
   const deleteUser = async (id) => {
+    const token = getToken();
 
     await fetch(API_URL + "/users/" + id, {
-
-      method: "DELETE"
-
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     });
 
     getUsers();
-
   };
 
   return (
-
     <Container sx={{ mt: 4 }}>
-
       <Paper sx={{ p: 4, mb: 4 }}>
-
         <Typography variant="h4" gutterBottom>
           Usuarios
         </Typography>
 
         <Box component="form" onSubmit={addUser} sx={{ display: "grid", gap: 2 }}>
-
           <TextField
             label="Nombre"
             name="name"
@@ -123,58 +125,35 @@ function Usuarios() {
           <Button type="submit" variant="contained">
             Agregar usuario
           </Button>
-
         </Box>
-
       </Paper>
 
       <Paper sx={{ p: 4 }}>
-
         <Typography variant="h5" gutterBottom>
           Lista de usuarios
         </Typography>
 
         <List>
-
-          {
-
-            users.map(user => (
-
-              <ListItem
-
-                key={user._id}
-
-                secondaryAction={
-
-                  <Button
-                    color="error"
-                    variant="outlined"
-                    onClick={() => deleteUser(user._id)}
-                  >
-                    Eliminar
-                  </Button>
-
-                }
-              >
-
-                <ListItemText
-                  primary={`${user.name} (${user.username})`}
-                />
-
-              </ListItem>
-
-            ))
-
-          }
-
+          {users.map((user) => (
+            <ListItem
+              key={user._id}
+              secondaryAction={
+                <Button
+                  color="error"
+                  variant="outlined"
+                  onClick={() => deleteUser(user._id)}
+                >
+                  Eliminar
+                </Button>
+              }
+            >
+              <ListItemText primary={`${user.name} (${user.username})`} />
+            </ListItem>
+          ))}
         </List>
-
       </Paper>
-
     </Container>
-
   );
-
 }
 
 export default Usuarios;

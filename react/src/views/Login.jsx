@@ -17,12 +17,12 @@ function Login({ onLogin }) {
     });
 
     if (res.success) {
-      setUsername("");
-      setPassword("");
-      navigate("/home");
-    } else {
-      alert("Credenciales incorrectas");
-    }
+  setUsername("");
+  setPassword("");
+  navigate("/home");
+  } else {
+  alert(res.msg || "Credenciales incorrectas");
+}
   };
 
   return (
