@@ -7,7 +7,7 @@ import Home from "./views/Home";
 import Perfil from "./views/Perfil";
 import Navbar from "./components/Nav";
 
-const API_URL = "http://localhost:5001";
+const API_URL = import.meta.env.VITE_API_URL;
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
