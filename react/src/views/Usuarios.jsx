@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import {
   Container,
   Paper,
@@ -11,42 +12,17 @@ import {
   ListItemText
 } from "@mui/material";
 
-const API_URL = import.meta.env.VITE_API_URL;
+import { useUsers } from "../hooks/useUsers";
+import LifecycleLogger from "../components/LifecycleLogger";
+
 function Usuarios() {
-  const [users, setUsers] = useState([]);
+  const { users, loading, addUser, deleteUser } = useUsers();
 
   const [form, setForm] = useState({
     name: "",
     username: "",
     password: ""
   });
-
-  const getToken = () => {
-    return localStorage.getItem("token");
-  };
-
-  const getUsers = async () => {
-    const token = getToken();
-
-    const res = await fetch(API_URL + "/users", {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    const data = await res.json();
-
-    if (Array.isArray(data)) {
-      setUsers(data);
-    } else {
-      alert(data.msg || "No se pudieron cargar los usuarios");
-    }
-  };
-
-  useEffect(() => {
-    getUsers();
-  }, []);
 
   const handleChange = (e) => {
     setForm({
@@ -55,50 +31,26 @@ function Usuarios() {
     });
   };
 
-  const addUser = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const token = getToken();
-
-    await fetch(API_URL + "/users", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify(form)
-    });
+    await addUser(form);
 
     setForm({
       name: "",
       username: "",
       password: ""
     });
-
-    getUsers();
-  };
-
-  const deleteUser = async (id) => {
-    const token = getToken();
-
-    await fetch(API_URL + "/users/" + id, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-
-    getUsers();
   };
 
   return (
     <Container sx={{ mt: 4 }}>
       <Paper sx={{ p: 4, mb: 4 }}>
-        <Typography variant="h4" gutterBottom>
+        <Typography variant="h4" gutterBottom align="center">
           Usuarios
         </Typography>
 
-        <Box component="form" onSubmit={addUser} sx={{ display: "grid", gap: 2 }}>
+        <Box component="form" onSubmit={handleSubmit} sx={{ display: "grid", gap: 2 }}>
           <TextField
             label="Nombre"
             name="name"
@@ -128,29 +80,45 @@ function Usuarios() {
       </Paper>
 
       <Paper sx={{ p: 4 }}>
-        <Typography variant="h5" gutterBottom>
+        <Typography variant="h5" gutterBottom align="center">
           Lista de usuarios
         </Typography>
 
-        <List>
-          {users.map((user) => (
-            <ListItem
-              key={user._id}
-              secondaryAction={
-                <Button
-                  color="error"
-                  variant="outlined"
-                  onClick={() => deleteUser(user._id)}
-                >
-                  Eliminar
-                </Button>
-              }
-            >
-              <ListItemText primary={`${user.name} (${user.username})`} />
-            </ListItem>
-          ))}
-        </List>
+        {loading ? (
+          <Typography>Cargando usuarios...</Typography>
+        ) : (
+          <List>
+            {users.map((user) => (
+              <ListItem
+                key={user._id}
+                secondaryAction={
+                  <Box sx={{ display: "flex", gap: 1 }}>
+                    <Button
+                      component={Link}
+                      to={`/usuarios/${user._id}`}
+                      variant="outlined"
+                    >
+                      Ver detalle
+                    </Button>
+
+                    <Button
+                      color="error"
+                      variant="outlined"
+                      onClick={() => deleteUser(user._id)}
+                    >
+                      Eliminar
+                    </Button>
+                  </Box>
+                }
+              >
+                <ListItemText primary={`${user.name} (${user.username})`} />
+              </ListItem>
+            ))}
+          </List>
+        )}
       </Paper>
+
+      <LifecycleLogger />
     </Container>
   );
 }

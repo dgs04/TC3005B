@@ -6,6 +6,7 @@ import Login from "./views/Login";
 import Home from "./views/Home";
 import Perfil from "./views/Perfil";
 import Navbar from "./components/Nav";
+import UsuarioDetalle from "./views/UsuarioDetalle";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -90,6 +91,12 @@ function App() {
           path="/usuarios"
           element={
             isAuthenticated ? <Usuarios /> : <Navigate to="/" />
+          }
+        />
+        <Route
+          path="/usuarios/:id"
+          element={
+            isAuthenticated ? <UsuarioDetalle /> : <Navigate to="/" />
           }
         />
       </Routes>
